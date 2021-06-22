@@ -43,6 +43,12 @@ PageTemplate.prototype.askMoreQue = function(type){
             type: 'text',
             name: 'github',
             message: 'What is your' + type + '\'s github username?'
+        },
+        {
+            type: 'list',
+            name: 'type',
+            message: 'Which type of team member you would like to add?',
+            choices : ["Engineer", "Intern" , "I don\'t want to add more team members"]
         }
     ]).then(data =>{
         console.log(data);
