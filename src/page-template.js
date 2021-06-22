@@ -4,21 +4,41 @@ function PageTemplate(start, end){
     this.end = end;
 }
 
+PageTemplate.prototype.teamManagerCard = function(data){
+    return `<div class="info-card">
+    <div class="card-title">
+        <h3>${data.name}</h3>
+        <h3><i class="fas fa-mug-hot"></i> Manager</h3>
+    </div>
+        <div class="info">
+            <ul>
+                <li>ID: ${data.id}</li>
+                <li>Email: <a href="mailto:${data.email}">${data.email}</a></li>
+                <li>Office number: ${data.number}</li>
+            </ul>
+        </div>
+</div>`;
+}
+
 PageTemplate.prototype.htmlContent = function(data){
     return `${this.start}
-    ${data}
+    ${this.teamManagerCard(data)}
     ${this.end}`;
 }
 
 const fs = require("fs");
 PageTemplate.prototype.generatePage = function(data){
+    fs.copyFile("./lib/css/style.css", "./dist/style.css", err => {
+        if (err) throw err;
+    });
+
     fs.writeFile("./dist/index.html", this.htmlContent(data) , err => {
         if (err) throw err;
         console.log("Team Profile HTML file created succesfully");
     });
 }
 
-PageTemplate.prototype.askMoreQue = function(type){
+PageTemplate.prototype.askMoreQue = function(type, teamManager){
     inquirer.prompt([
         {
             type: 'text',
@@ -64,10 +84,12 @@ PageTemplate.prototype.askMoreQue = function(type){
         }
     ]).then(data =>{
         if(data.type=== "Engineer" || data.type === "Intern"){
+            teamManager[data.type] = data;
+            console.log(teamManager);
             this.askMoreQue(data.type);
         }
         else{
-            this.generatePage(data);
+            this.generatePage(teamManager);
         }
     })
 }
