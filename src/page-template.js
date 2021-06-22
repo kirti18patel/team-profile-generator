@@ -9,7 +9,6 @@ function PageTemplate(start, end){
 }
 
 PageTemplate.prototype.teamManagerCard = function(teamManager){
-    console.log(teamManager);
     return `<div class="info-card">
     <div class="card-title">
         <h3>${teamManager.name}</h3>
@@ -29,10 +28,13 @@ PageTemplate.prototype.employeeInfoCard = function(){
     for(var i=0; i<this.employeeInfo.length; i++){
         if(this.employeeInfo[i].type==="Engineer"){
             var faIcon = "fas fa-glasses";
+            var que = "Github username";
         }
         else{
             var faIcon = "fas fa-user-graduate";
+            var que = "School"
         }
+        
         this.employeeInfoHtml+=`<div class="info-card">
         <div class="card-title">
             <h3>${this.employeeInfo[i].name}</h3>
@@ -42,7 +44,7 @@ PageTemplate.prototype.employeeInfoCard = function(){
                 <ul>
                     <li>ID: ${this.employeeInfo[i].id}</li>
                     <li>Email: <a href="mailto:${this.employeeInfo[i].email}">${this.employeeInfo[i].email}</a></li>
-                    <li>Office number: 1</li>
+                    <li>${que}: ${this.employeeInfo[i].que}</li>
                 </ul>
             </div>
     </div>`
@@ -69,6 +71,13 @@ PageTemplate.prototype.generatePage = function(teamManager){
 }
 
 PageTemplate.prototype.askMoreQue = function(type, teamManager){
+    var que="";
+    if(type==="Engineer"){
+        que = "Github username";
+    }
+    else{
+        que = "School";
+    }
     inquirer.prompt([
         {
             type: 'text',
@@ -103,8 +112,8 @@ PageTemplate.prototype.askMoreQue = function(type, teamManager){
         },
         {
             type: 'text',
-            name: 'github',
-            message: 'What is your ' + type + '\'s github username?'
+            name: 'que',
+            message: 'What is your ' + type + '\'s ' + que + '?'
         },
         {
             type: 'list',
@@ -113,14 +122,20 @@ PageTemplate.prototype.askMoreQue = function(type, teamManager){
             choices : ["Engineer", "Intern" , "I don\'t want to add more team members"]
         }
     ]).then(data =>{
+        if(data.type!=="I don\'t want to add more team members"){
+            var nextType = data.type;
+            data.type = type;
+        }
+        
+        this.employeeInfo.push(data);
         if(data.type=== "Engineer" || data.type === "Intern"){
-            this.employeeInfo.push(data);
-            console.log(this.employeeInfo);
-            this.askMoreQue(data.type, teamManager);
+            this.askMoreQue(nextType, teamManager);
         }
         else{
+            data.type = type;
             this.generatePage(teamManager);
-        }
+        }  
+        
     })
 }
 
