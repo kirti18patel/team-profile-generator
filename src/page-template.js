@@ -1,9 +1,21 @@
-const TeamGenerator = require("../lib/teamGenerator");
-const inquirer = require('inquirer'); 
-
+const inquirer = require('inquirer');
 function PageTemplate(start, end){
     this.start = start;
     this.end = end;
+}
+
+PageTemplate.prototype.htmlContent = function(data){
+    return `${this.start}
+    ${data}
+    ${this.end}`;
+}
+
+const fs = require("fs");
+PageTemplate.prototype.generatePage = function(data){
+    fs.writeFile("./dist/index.html", this.htmlContent(data) , err => {
+        if (err) throw err;
+        console.log("Team Profile HTML file created succesfully");
+    });
 }
 
 PageTemplate.prototype.askMoreQue = function(type){
@@ -24,7 +36,7 @@ PageTemplate.prototype.askMoreQue = function(type){
         {
             type: 'text',
             name: 'id',
-            message: 'What is your' + type + '\'s id?',
+            message: 'What is your ' + type + '\'s id?',
             validate: id => {
               if (!isNaN(id) && id>0) {
                 return true;
@@ -37,12 +49,12 @@ PageTemplate.prototype.askMoreQue = function(type){
         {
             type: 'text',
             name: 'id',
-            message: 'What is your' + type + '\'s email?'
+            message: 'What is your ' + type + '\'s email?'
         },
         {
             type: 'text',
             name: 'github',
-            message: 'What is your' + type + '\'s github username?'
+            message: 'What is your ' + type + '\'s github username?'
         },
         {
             type: 'list',
@@ -51,7 +63,13 @@ PageTemplate.prototype.askMoreQue = function(type){
             choices : ["Engineer", "Intern" , "I don\'t want to add more team members"]
         }
     ]).then(data =>{
-        console.log(data);
+        if(data.type=== "Engineer" || data.type === "Intern"){
+            this.askMoreQue(data.type);
+        }
+        else{
+            this.generatePage(data);
+        }
     })
 }
+
 module.exports = PageTemplate;
