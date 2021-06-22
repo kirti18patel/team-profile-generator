@@ -1,38 +1,68 @@
 const inquirer = require('inquirer');
+const fs = require("fs");
+
 function PageTemplate(start, end){
     this.start = start;
     this.end = end;
+    this.employeeInfo =[];
+    this.employeeInfoHtml='';
 }
 
-PageTemplate.prototype.teamManagerCard = function(data){
+PageTemplate.prototype.teamManagerCard = function(teamManager){
+    console.log(teamManager);
     return `<div class="info-card">
     <div class="card-title">
-        <h3>${data.name}</h3>
+        <h3>${teamManager.name}</h3>
         <h3><i class="fas fa-mug-hot"></i> Manager</h3>
     </div>
         <div class="info">
             <ul>
-                <li>ID: ${data.id}</li>
-                <li>Email: <a href="mailto:${data.email}">${data.email}</a></li>
-                <li>Office number: ${data.number}</li>
+                <li>ID: ${teamManager.id}</li>
+                <li>Email: <a href="mailto:${teamManager.email}">${teamManager.email}</a></li>
+                <li>Office number: ${teamManager.number}</li>
             </ul>
         </div>
 </div>`;
 }
 
-PageTemplate.prototype.htmlContent = function(data){
+PageTemplate.prototype.employeeInfoCard = function(){
+    for(var i=0; i<this.employeeInfo.length; i++){
+        if(this.employeeInfo[i].type==="Engineer"){
+            var faIcon = "fas fa-glasses";
+        }
+        else{
+            var faIcon = "fas fa-user-graduate";
+        }
+        this.employeeInfoHtml+=`<div class="info-card">
+        <div class="card-title">
+            <h3>${this.employeeInfo[i].name}</h3>
+            <h3><i class="${faIcon}"></i> ${this.employeeInfo[i].type}</h3>
+        </div>
+            <div class="info">
+                <ul>
+                    <li>ID: ${this.employeeInfo[i].id}</li>
+                    <li>Email: <a href="mailto:${this.employeeInfo[i].email}">${this.employeeInfo[i].email}</a></li>
+                    <li>Office number: 1</li>
+                </ul>
+            </div>
+    </div>`
+    }
+    return this.employeeInfoHtml;
+}
+
+PageTemplate.prototype.htmlContent = function(teamManager){
     return `${this.start}
-    ${this.teamManagerCard(data)}
+    ${this.teamManagerCard(teamManager)}
+    ${this.employeeInfoCard()}
     ${this.end}`;
 }
 
-const fs = require("fs");
-PageTemplate.prototype.generatePage = function(data){
+PageTemplate.prototype.generatePage = function(teamManager){
     fs.copyFile("./lib/css/style.css", "./dist/style.css", err => {
         if (err) throw err;
     });
 
-    fs.writeFile("./dist/index.html", this.htmlContent(data) , err => {
+    fs.writeFile("./dist/index.html", this.htmlContent(teamManager) , err => {
         if (err) throw err;
         console.log("Team Profile HTML file created succesfully");
     });
@@ -68,7 +98,7 @@ PageTemplate.prototype.askMoreQue = function(type, teamManager){
         },
         {
             type: 'text',
-            name: 'id',
+            name: 'email',
             message: 'What is your ' + type + '\'s email?'
         },
         {
@@ -84,9 +114,9 @@ PageTemplate.prototype.askMoreQue = function(type, teamManager){
         }
     ]).then(data =>{
         if(data.type=== "Engineer" || data.type === "Intern"){
-            teamManager[data.type] = data;
-            console.log(teamManager);
-            this.askMoreQue(data.type);
+            this.employeeInfo.push(data);
+            console.log(this.employeeInfo);
+            this.askMoreQue(data.type, teamManager);
         }
         else{
             this.generatePage(teamManager);
