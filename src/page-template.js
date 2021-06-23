@@ -1,10 +1,10 @@
 const inquirer = require('inquirer');
 const fs = require("fs");
 
-function PageTemplate(start, end){
+function PageTemplate(start, end, employeeInfo){
     this.start = start;
     this.end = end;
-    this.employeeInfo =[];
+    this.employeeInfo =employeeInfo;
     this.employeeInfoHtml='';
 }
 
@@ -70,73 +70,6 @@ PageTemplate.prototype.generatePage = function(teamManager){
     });
 }
 
-PageTemplate.prototype.askMoreQue = function(type, teamManager){
-    var que="";
-    if(type==="Engineer"){
-        que = "Github username";
-    }
-    else{
-        que = "School";
-    }
-    inquirer.prompt([
-        {
-            type: 'text',
-            name: 'name',
-            message: 'What is your ' + type + '\'s name?',
-            validate: name => {
-              if (name && isNaN(name)) {
-                return true;
-              } else {
-                console.log('Please enter valid name!');
-                return false;
-              }
-            }
-        },
-        {
-            type: 'text',
-            name: 'id',
-            message: 'What is your ' + type + '\'s id?',
-            validate: id => {
-              if (!isNaN(id) && id>0) {
-                return true;
-              } else {
-                console.log('Please enter valid id!');
-                return false;
-              }
-            }
-        },
-        {
-            type: 'text',
-            name: 'email',
-            message: 'What is your ' + type + '\'s email?'
-        },
-        {
-            type: 'text',
-            name: 'que',
-            message: 'What is your ' + type + '\'s ' + que + '?'
-        },
-        {
-            type: 'list',
-            name: 'type',
-            message: 'Which type of team member you would like to add?',
-            choices : ["Engineer", "Intern" , "I don\'t want to add more team members"]
-        }
-    ]).then(data =>{
-        if(data.type!=="I don\'t want to add more team members"){
-            var nextType = data.type;
-            data.type = type;
-        }
-        
-        this.employeeInfo.push(data);
-        if(data.type=== "Engineer" || data.type === "Intern"){
-            this.askMoreQue(nextType, teamManager);
-        }
-        else{
-            data.type = type;
-            this.generatePage(teamManager);
-        }  
-        
-    })
-}
+
 
 module.exports = PageTemplate;

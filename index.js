@@ -1,3 +1,3 @@
-const teamGenerator = require("./lib/teamGenerator");
+const TeamGenerator = require("./lib/TeamGenerator");
 
-new teamGenerator().initializeGenaration();
+new TeamGenerator().initializeGenaration();
