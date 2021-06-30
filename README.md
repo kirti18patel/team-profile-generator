@@ -34,6 +34,7 @@ click the link below to check the repository : [Github Repository Link](https://
   ```
 
 ## Preview
+![alt screenshot](Screenshot.png)
 ![alt app-demo-gif](walkthroughvideo.gif)
 
 ## Usage 
